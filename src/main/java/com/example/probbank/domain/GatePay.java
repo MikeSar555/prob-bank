@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-//@Table("gate_pay")
+@Table("gate_pay")
 public class GatePay {
 
     @Id
