@@ -1,35 +1,42 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:form="http://www.w3.org/1999/html">
+<html lang="en"
+  xmlns:form="http://www.w3.org/1999/html">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name = "viewport"
-          content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script>
-        var token = '';
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    var token = '';
+  </script>
 </head>
+
 <body>
-Hello? {{User.username}}!
-<form
-        onsubmit = "
+  Hello? {{User.username}}!
+  <form onsubmit="
         var payload = {
             method = 'post',
             headers = {
-                'content-type' : 'application/x-www-form-url-encoded'
+                'content-type' : 'application/x-www-form-url-encoded' 
                 'body' :  `name=${this.username.value}&password=${this.password.value}`
             }
         };
         fetch('/login', payload).then(resp => resp.text()).then(text =>console.log(text));
 
         return false;
-"
->
-    <input type = "text" name = "username">
-    <input type = "password" name = "password" autocomplete="off">
-    <input type = "submit" value = "Sign in">
+">
+    <input type="text"
+      name="username">
+    <input type="password"
+      name="password"
+      autocomplete="off">
+    <input type="submit"
+      value="Sign in">
 
-    <input type="button" value="controller" onclick="
+    <input type="button"
+      value="controller"
+      onclick="
 fetch(
     '/controller',
     {
@@ -40,7 +47,9 @@ fetch(
 ).then(resp => resp.json()).then(console.log)
 ">
 
-    <input type="button" value="hello" onclick="
+    <input type="button"
+      value="hello"
+      onclick="
 fetch(
     '/hello',
     {
@@ -51,7 +60,8 @@ fetch(
 ).then(resp => resp.json()).then(console.log)
 ">
 
-</form>
+  </form>
 
 </body>
+
 </html>
