@@ -31,4 +31,3 @@ public class GatePay {
     private Double amount;
 
 }
-

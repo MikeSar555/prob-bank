@@ -7,6 +7,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -46,32 +47,35 @@ public class WebSecurityConfig {
         // AuthenticationWebFilter();
 
         System.out.println("Поехали!");
+
         return httpSecurity
-                /*
-                 * .exceptionHandling()
-                 * .authenticationEntryPoint(
-                 * (swe, e) ->
-                 * Mono.fromRunnable(
-                 * () -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED)
-                 * )
-                 * )
-                 * .accessDeniedHandler(
-                 * (swe, e) ->
-                 * Mono.fromRunnable(
-                 * () -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)
-                 * )
-                 * )
-                 * .and()
-                 */
-                .csrf().disable()
-                .formLogin().and()
-                .httpBasic().disable()
-                .authorizeExchange()
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.addAllowedOrigin("http://localhost:3000");
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+                    config.addExposedHeader("Content-Type");
+                    config.setAllowCredentials(true); // Добавьте это
+                    return config;
+                }))
+                .csrf().disable().formLogin().and().httpBasic().disable().authorizeExchange()
+                .pathMatchers("/controller/paysByParam", "/fio").permitAll() // Разрешите
                 .pathMatchers("/", "/login", "/favicon.ico").permitAll()
-                .pathMatchers("/controller/**", "/fio/**").hasRole("MONITOR")
-                .anyExchange().authenticated()
-                .and().authorizeExchange()
-                .and()
-                .build();
+                .pathMatchers("/controller/**", "/fio/**")
+                .hasRole("MONITOR").anyExchange().authenticated().and()
+                .authorizeExchange().and().build();
+
+        // .csrf().disable()
+        // .formLogin().and()
+        // .httpBasic().disable()
+        // .authorizeExchange()
+        // .pathMatchers("/", "/login", "/favicon.ico").permitAll()
+        // .pathMatchers("/controller/**", "/fio/**").hasRole("MONITOR")
+        // .anyExchange().authenticated()
+        // .and().authorizeExchange()
+        // .and()
+        // .build();
+
     }
+
 }

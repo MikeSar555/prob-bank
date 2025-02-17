@@ -7,8 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.result.view.RedirectView;
 
 import com.example.probbank.domain.GatePay;
 import com.example.probbank.service.GatePayService;
@@ -56,6 +58,12 @@ public class ProbBankController {
                 PageRequest.of(page - 1, size)).delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS));
         return payByFio;
     }
+
+    // @PostMapping("/login")
+    // public RedirectView login() {
+    // return new RedirectView("http://localhost:3000"); // URL вашего
+    // React-приложения
+    // }
 
     /*
      * @GetMapping("")
