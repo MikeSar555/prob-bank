@@ -2,6 +2,8 @@ package com.example.probbank.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -13,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 @Table("user")
 public class User implements UserDetails {
 
@@ -23,7 +26,7 @@ public class User implements UserDetails {
     private String descr;
     @Column("login")
     private UserRole role;
-    @JsonIgnore
+    // @JsonIgnore
     @Column("pass")
     private String password;
     private int enable_web;
@@ -51,6 +54,6 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-        //return this.getEnable_web()==1 ? true: false;
+        // return this.getEnable_web()==1 ? true: false;
     }
 }

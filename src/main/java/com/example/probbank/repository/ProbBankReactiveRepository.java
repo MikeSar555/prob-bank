@@ -8,16 +8,11 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface ProbBankReactiveRepository extends ReactiveCrudRepository<GatePay, String> {
+public interface ProbBankReactiveRepository extends ReactiveCrudRepository<GatePay, Integer> {
 
-    Flux<GatePay>  findByParamsContaining(String s, final Pageable page);
+    Flux<GatePay> findByParamsContaining(String s, final Pageable page);
 
-
-
-
-
-
-    Flux<GatePay>  findByClientFioContaining(String f, final Pageable page);
+    Flux<GatePay> findByClientFioContaining(String f, final Pageable page);
 
     Flux<GatePay> findByParamsContaining(String param);
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,10 +60,21 @@ public class ProbBankController {
         return payByFio;
     }
 
+    @GetMapping(path = "/findAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<GatePay> findAll() {
+        // @ModelAttribute
+        return null;
+
+    }
+
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+
     // @PostMapping("/login")
     // public RedirectView login() {
     // return new RedirectView("http://localhost:3000"); // URL вашего
-    // React-приложения
+    // // React-приложения
     // }
 
     /*

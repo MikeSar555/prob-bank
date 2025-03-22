@@ -18,7 +18,7 @@
         var payload = {
             method = 'post',
             headers = {
-                'content-type' : 'application/x-www-form-url-encoded' 
+                'content-type' : 'application/x-www-form-url-encoded', 
                 'body' :  `name=${this.username.value}&password=${this.password.value}`
             }
         };
@@ -38,7 +38,7 @@
       value="controller"
       onclick="
 fetch(
-    '/controller',
+    '',
     {
         headers: {
             'Authorization': `Bearer ${token}`
