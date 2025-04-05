@@ -3,6 +3,7 @@ package com.example.probbank.controller;
 
 import com.example.probbank.configuration.JwtUtil;
 import com.example.probbank.domain.User;
+import com.example.probbank.domain.UserRole;
 import com.example.probbank.repository.UserReactiveRepo;
 import com.example.probbank.service.UserService;
 
@@ -51,4 +52,20 @@ public class UserController {
                                 })
                                 .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
         }
+
+        @PostMapping("/auth/service")
+        public Mono<ResponseEntity<Map<String, UserRole>>> generateServiceToken() {
+                // сторонний сервис получает пользователя с правами MONITOR
+                return userReactiveRepo.findByUsername("Мониторинг")
+                                .flatMap(user -> {
+                                        String token = jwtUtil.generateToken(user);
+                                        System.out.println("user: " + user + " token: " + token);
+                                        return Mono.just(ResponseEntity.ok()
+                                                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                                                        .body(Map.of("role", user.getRole())));
+                                })
+                                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
+
+        }
+
 }

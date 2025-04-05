@@ -25,17 +25,28 @@ public class ProbBankController {
     @Autowired
     private final GatePayService gatePayService;
 
-    private static final int DELAY_PER_ITEM_MS = 100;
+    private static final int DELAY_PER_ITEM_MS = 0;
 
     public ProbBankController(GatePayService gatePayService) {
         this.gatePayService = gatePayService;
     }
 
-    @GetMapping(path = "/controller/paysByParam", produces = "text/event-stream")
-    public Flux<GatePay> getPaysByParams(@RequestParam(value = "param", defaultValue = "www") String par,
-            final @RequestParam(name = "page") int page,
-            final @RequestParam(name = "size") int size) {
-        Flux<GatePay> payFlux = gatePayService.paysByParams(par, PageRequest.of(page - 1, size))
+    @GetMapping(path = "/controller/paysByParam", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<GatePay> getPaysByParams(
+            @RequestParam(value = "param", defaultValue = "www") String par,
+            @RequestParam(name = "page") int page,
+            @RequestParam(name = "size") int size) {
+        return gatePayService.paysByParams(par, PageRequest.of(page - 1, size))
+                .delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS))
+                .onErrorResume(e -> {
+                    System.out.println("Ошибка при генерации SSE " + e);
+                    return Flux.empty(); // Не прерывать поток
+                });
+    }
+
+    @GetMapping(path = "/controller/paysByParamAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<GatePay> getPaysByParams(@RequestParam(value = "param", defaultValue = "www") String par) {
+        Flux<GatePay> payFlux = gatePayService.paysByParams(par)
                 .delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS));
         ;
         return payFlux;
@@ -70,20 +81,5 @@ public class ProbBankController {
     public String getMethodName(@RequestParam String param) {
         return new String();
     }
-
-    // @PostMapping("/login")
-    // public RedirectView login() {
-    // return new RedirectView("http://localhost:3000"); // URL вашего
-    // // React-приложения
-    // }
-
-    /*
-     * @GetMapping("")
-     * public Mono<String> greet(Mono<Principal> principal) {
-     * return principal
-     * .map(Principal::getName)
-     * .map(name -> String.format("Hello, %s", name));
-     * }
-     */
 
 }

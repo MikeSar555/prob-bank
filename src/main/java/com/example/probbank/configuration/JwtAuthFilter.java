@@ -43,3 +43,42 @@ public class JwtAuthFilter implements WebFilter {
     }
 
 }
+
+/*
+ * @Override
+ * public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+ * String token = extractToken(exchange.getRequest());
+ * if (token != null && jwtUtil.validatetoken(token)) {
+ * Authentication auth = new UsernamePasswordAuthenticationToken(
+ * jwtUtil.extractUserName(token),
+ * null,
+ * jwtUtil.extractAuthorities(token));
+ * return chain.filter(exchange)
+ * .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+ * }
+ * return chain.filter(exchange);
+ * }
+ * 
+ * 
+ */
+/*
+ * @Override
+ * public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+ * return Mono.justOrEmpty(extractToken(exchange.getRequest()))
+ * .filter(token -> jwtUtil.validatetoken(token))
+ * .flatMap(token -> {
+ * Authentication auth = new UsernamePasswordAuthenticationToken(
+ * jwtUtil.extractUserName(token),
+ * null,
+ * jwtUtil.extractAuthorities(token));
+ * // Сохраняем аутентификацию в сессии
+ * return exchange.getSession()
+ * .doOnNext(session -> session.getAttributes().put("SPRING_SECURITY_CONTEXT",
+ * auth))
+ * .then(chain.filter(exchange))
+ * .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+ * })
+ * .switchIfEmpty(chain.filter(exchange));
+ * }
+ * 
+ */
