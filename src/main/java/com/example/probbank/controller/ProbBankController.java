@@ -15,6 +15,7 @@ import org.springframework.web.reactive.result.view.RedirectView;
 
 import com.example.probbank.domain.GatePay;
 import com.example.probbank.service.GatePayService;
+import com.example.probbank.service.KafkaLoggingService;
 
 import reactor.core.publisher.Flux;
 
@@ -24,6 +25,9 @@ import reactor.core.publisher.Flux;
 public class ProbBankController {
     @Autowired
     private final GatePayService gatePayService;
+
+    @Autowired
+    private KafkaLoggingService kafkaLoggingService;
 
     private static final int DELAY_PER_ITEM_MS = 0;
 
@@ -36,20 +40,27 @@ public class ProbBankController {
             @RequestParam(value = "param", defaultValue = "www") String par,
             @RequestParam(name = "page") int page,
             @RequestParam(name = "size") int size) {
+        kafkaLoggingService.log("/controller/paysByParam Search request with param: " + par + " страница " + page
+                + " строк на странице " + size);
         return gatePayService.paysByParams(par, PageRequest.of(page - 1, size))
                 .delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS))
                 .onErrorResume(e -> {
                     System.out.println("Ошибка при генерации SSE " + e);
+                    kafkaLoggingService.log("Error in SSE: " + e.getMessage());
                     return Flux.empty(); // Не прерывать поток
                 });
     }
 
     @GetMapping(path = "/controller/paysByParamAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<GatePay> getPaysByParams(@RequestParam(value = "param", defaultValue = "www") String par) {
-        Flux<GatePay> payFlux = gatePayService.paysByParams(par)
-                .delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS));
-        ;
-        return payFlux;
+        kafkaLoggingService.log("/controller/paysByParamAll Search request with param: " + par);
+        return gatePayService.paysByParams(par)
+                .delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS))
+                .onErrorResume(e -> {
+                    System.out.println("Ошибка при генерации SSE " + e);
+                    kafkaLoggingService.log("Error in SSE: " + e.getMessage());
+                    return Flux.empty(); // Не прерывать поток
+                });
     }
 
     @GetMapping(path = "/controller", produces = "text/event-stream")
@@ -66,9 +77,16 @@ public class ProbBankController {
     public Flux<GatePay> findByFio(@RequestParam(value = "fio") String fio,
             final @RequestParam(name = "page") int page,
             final @RequestParam(name = "size") int size) {
-        Flux<GatePay> payByFio = gatePayService.paysByFIO(fio,
-                PageRequest.of(page - 1, size)).delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS));
-        return payByFio;
+
+        kafkaLoggingService
+                .log("/fio Search request with param: " + fio + " страница " + page + " строк на странице " + size);
+        return gatePayService.paysByFIO(fio,
+                PageRequest.of(page - 1, size)).delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS))
+                .onErrorResume(e -> {
+                    System.out.println("Ошибка при генерации SSE " + e);
+                    kafkaLoggingService.log("Error in SSE: " + e.getMessage());
+                    return Flux.empty(); // Не прерывать поток
+                });
     }
 
     @GetMapping(path = "/findAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

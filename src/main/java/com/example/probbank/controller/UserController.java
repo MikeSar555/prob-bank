@@ -5,12 +5,14 @@ import com.example.probbank.configuration.JwtUtil;
 import com.example.probbank.domain.User;
 import com.example.probbank.domain.UserRole;
 import com.example.probbank.repository.UserReactiveRepo;
+import com.example.probbank.service.KafkaLoggingService;
 import com.example.probbank.service.UserService;
 
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import org.springframework.web.reactive.result.view.RedirectView;
 public class UserController {
         private final JwtUtil jwtUtil;
         private final UserReactiveRepo userReactiveRepo;
+        @Autowired
+        private KafkaLoggingService kafkaLoggingService;
 
         public UserController(JwtUtil jwtUtil, UserReactiveRepo userReactiveRepo) {
                 this.jwtUtil = jwtUtil;
@@ -34,7 +38,7 @@ public class UserController {
         public Mono<ResponseEntity<?>> login(@RequestBody User request) {
                 System.out.println("Login attempt for user: " + request.getUsername() + ", password: "
                                 + request.getPassword());
-                System.out.println("Request body: " + request.toString()); // Убедитесь, что данные приходят
+                kafkaLoggingService.log("Login attempt: " + request.getUsername());
 
                 return userReactiveRepo.findByUsername(request.getUsername())
                                 .flatMap(user -> {
@@ -60,6 +64,7 @@ public class UserController {
                                 .flatMap(user -> {
                                         String token = jwtUtil.generateToken(user);
                                         System.out.println("user: " + user + " token: " + token);
+                                        kafkaLoggingService.log("request from service : " + user);
                                         return Mono.just(ResponseEntity.ok()
                                                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                                         .body(Map.of("role", user.getRole())));
