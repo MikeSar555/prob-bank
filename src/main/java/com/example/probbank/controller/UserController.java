@@ -34,7 +34,7 @@ public class UserController {
 
         }
 
-        @PostMapping("/login")
+        @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
         public Mono<ResponseEntity<?>> login(@RequestBody User request) {
                 System.out.println("Login attempt for user: " + request.getUsername() + ", password: "
                                 + request.getPassword());
